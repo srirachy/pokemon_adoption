@@ -1,0 +1,33 @@
+// *{
+//     height: 100%;
+// }
+
+.pbImg{
+    height: 100%;
+    width: 30px;
+    margin-left: 10px;
+}
+th, td {
+    border-bottom: 1px solid;
+    text-align: center;
+  }
+
+table {
+      width: 100%;
+  }
+
+th {
+    text-align: center;
+    background-color: #006EB6;
+    color: #FFCC01;
+  }
+
+h2 {
+    display: inline-block;
+    border: 2px solid #006EB6;
+    // background-color: #ffe373;
+    color: #006EB6;
+}
+ul {
+  list-style-type: none;
+}
