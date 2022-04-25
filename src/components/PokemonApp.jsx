@@ -1,9 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import RenderImages from './RenderImages';
-import Image from './Image';
+import FormSection from './FormSection';
+import NewPokemonHeader from './NewPokemonHeader';
+import RenderForm from './RenderForm';
+import TableSection from './TableSection';
+import RenderTableRow from './RenderTableRow';
+import emptyPbImg from "../img/empty_pokeball.svg";
+import colorPbImg from "../img/color_pokeball.svg";
+import '../scss/index.scss';
 
-const BASETABLEURL = 'https://pokeapi.co/api/v2/pokemon?limit=100&offset=0'
-const BASEURL = 'https://pokeapi.co/api/v2/'
+const BASETABLEURL = 'https://pokeapi.co/api/v2/pokemon?limit=20&offset=0';
+// const TBASEURL = 'pokemon?limit=20&offset=0';
+const TBASEURL = 'generation/1';
+const BASEURL = 'https://pokeapi.co/api/v2/';
+const GENONEMIN = 1;
+const GENONEMAX = 151;
+const GENTWOMIN = 152;
 let searchPokemon = '';
 //way to search singular pokemon example
 //https://pokeapi.co/api/v2/pokemon/ditto
@@ -13,90 +24,97 @@ let searchPokemon = '';
 //https://pokeapi.co/api/v2/pokemon?limit=100&offset=0'
 
 const PokemonApp = () => {
-    const [firstHunnitName, setFirstHunnitName] = useState(null);
-    const [firstHunnitUrl, setFirstHunnitUrl] = useState(null);
-    // const [firstHunnitImg, setFirstHunnitImg] = useState(null);
-    // const [pokemonUrl, setPokemonUrl] = useState('');
-    // const [pokemonAlt, setPokemonAlt] = useState('');
-    const [firstHunnit, setFirstHunnit] = useState([]);
-    const [oneImg, setOneImg] = useState('');
-    // const [firstHunnitImg, setFirstHunnitImg] = useState(null);
-    // const [firstHunnitAlt, setFirstHunnitAlt] = useState(null);
-    //let initialPokemonState = firstHunnit;
-    //let pokemonNames = firstHunnit.map(thePokemon => thePokemon.results.name)
-    //const {results} = firstHunnit;
+    const [hideForm, setHideForm] = useState(false);
+    const [pokeballImg, setPokeballImg] = useState(emptyPbImg);
+    const [imgAltText, setImgAltText] = useState('show form');
+    const [searchState, setSearchState] = useState(0);
+    const [newSearch, setNewSearch] = useState('');
+    const [searchPok, setSearchPok] = useState('ditto');
+    const [firstGenUrls, setFirstGenUrls] = useState([]);
+    const [firstGenRegionUrls, setFirstGenRegionUrls] = useState([]);
+    const [firstGenContent, setFirstGenContent] = useState([]);
+    const [firstTwennyContent, setFirstTwennyContent] = useState([]);
 
-    //useEffect for creating the initial table
+    const pokSearch = `https://pokeapi.co/api/v2/pokemon/${searchPok}`
+    //const {name, types} = data;
+
+    //setup initial table
     useEffect(() => {
+        //origal
+        //getPokemon(TBASEURL).then(res => setupPokemonTable(res.pokemon_species));
         const getData = async () => {
-            const res = await fetch(BASETABLEURL);
+            const res = await fetch(BASEURL + TBASEURL);
             const data = await res.json();
-            console.log(data);
-            const fetchedPokemon = data.results;
-            console.log(fetchedPokemon.map(thePokemon => thePokemon.name));
-            const nameMap = fetchedPokemon.map(thePokemon => thePokemon.name);
-            //const urlMap = fetchedPokemon.map(thePokemon => thePokemon.url);
-            setFirstHunnitName(nameMap);
-            //setFirstHunnitUrl(urlMap);
-            //good starting point
-            // const pokemonNames = data.results[0].name;
-            // console.log(`Pokemon Names: ${pokemonNames}`)
-            // setFirstHunnit(pokemonNames);
-            // console.log(firstHunnit + "meow");
+            //console.log(data);
+            const fetchedPokemon = data.pokemon_species;
+            const urlMap = fetchedPokemon.map(thePokemon => `${BASEURL}pokemon/${thePokemon.name}`);    //using name to get pokemon url
+            const regionUrlMap = fetchedPokemon.map(thePokemon => thePokemon.url);
+            setFirstGenUrls(urlMap);
+            setFirstGenRegionUrls(regionUrlMap);
+            
+            //start promise
+            Promise.all(urlMap.map(url =>
+                fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
+            )).then(thePokemon => {
+                setFirstGenContent(thePokemon); //set all content of first 151 pokemon
+                setFirstTwennyContent(thePokemon.slice(0, 19)); //set first twenty pokemon content
+            })
+            //run function to get 5 random nums
+            //
+            console.log(firstTwennyContent);
         };
-        getData();
+        getData(); 
     }, []);
 
-    useEffect(() => {
-        getPokemon('pokemon/?limit=20&offset=0').then(res => setupPokemonTable(res.results));
-    }, [])
-
-    //fetch for pokemon
-    const getPokemon = (url) => {
-        return fetch(BASEURL + url)
-        .then(result => {
-            return result.json();
-        })
+    // add new pokemon form toggler
+    const hideShowForm = () => {
+        (hideForm ? setHideForm(false) : setHideForm(true));
+        (hideForm ? setPokeballImg(emptyPbImg) : setPokeballImg(colorPbImg));
+        (hideForm ? setImgAltText('show form') : setImgAltText('hide form'));
     }
 
-    //call getPokemon
-
-    //function to setup pokemon table?
-    const setupPokemonTable = (list) => {
-        list.forEach(pokemon => {
-            //console.log(pokemon.name);
-            const pName = pokemon.name;
-            getPokemon('pokemon/' + pName).then(res => {
-                const img = res.sprites.front_default;
-                //console.log(img);
-                // setFirstHunnitImg(img);
-                const updatedVal = {imgUrl: img, altText: pName};
-                setFirstHunnit(firstHunnit => ([
-                    ...firstHunnit,
-                    updatedVal
-                ]));
-                //console.log(img)
-                //setOneImg(img);
-            });//
-            //console.log(imgElmts[pokemon]);
-        })
-        console.log(firstHunnit);
+    const changeSearchState = (buttonVal) => {
+        ((buttonVal === 0) ? setSearchState(1) : setSearchState(2));
     }
 
-    // const checkPokemon = () => {
-    //     const initialPokemonState = firstHunnit;
-    //     const pokemonNames = firstHunnit.map(thePokemon => thePokemon.results.name)
-    // }
+    const changePok = (e) => {
+        e.preventDefault();
+        setSearchPok(newSearch);
+        setSearchState(2)
+    }
 
+    const regionSelect = (buttonVal) => {
+        switch(buttonVal){
+            case 1:
+                //search link
+                break;
+            default:
+            
+        }
+        //set url to generation
+    }
 
     return (
     <>
-        <h1>See console for api data!</h1>
-        {firstHunnitName && <p>{firstHunnitName}</p>}
-        {firstHunnitUrl && <p>{firstHunnitUrl}</p>}
-
-        {firstHunnit && <RenderImages firstHunnit={firstHunnit}></RenderImages>}
-
+        <h1>Pokemon Adoption Center</h1>
+        {/* header */}
+        <p>add new pokemon here</p>
+        {/* pokeheader */}
+        <div>
+            <NewPokemonHeader hideShowForm={hideShowForm} pokeballImg={pokeballImg} imgAltText={imgAltText} className='pbImg'></NewPokemonHeader>
+            <FormSection>
+                {(hideForm && searchState === 0) && <h2>Search Pokemon by:</h2>}
+                {hideForm && <RenderForm changeSearchState={changeSearchState} searchState={searchState}></RenderForm>}
+            </FormSection>
+        </div>
+        <p>search for pokemon in table here</p>
+        {/* search section */}
+        <p>adopted pokemanz</p>
+        <TableSection>
+            {/* add a header for region later*/}
+            {firstTwennyContent && <tr><th>Name</th><th>Image</th><th>Type</th><th>Ability</th></tr>} 
+            {firstTwennyContent && <RenderTableRow firstTwennyContent={firstTwennyContent}></RenderTableRow>}
+        </TableSection>
     </> 
     );
 };
