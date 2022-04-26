@@ -8,7 +8,6 @@ import emptyPbImg from "../img/empty_pokeball.svg";
 import colorPbImg from "../img/color_pokeball.svg";
 import '../scss/index.scss';
 
-const BASETABLEURL = 'https://pokeapi.co/api/v2/pokemon?limit=20&offset=0';
 // const TBASEURL = 'pokemon?limit=20&offset=0';
 const GENONEURL = 'generation/1/';
 const GENTWOURL = 'generation/2/';
@@ -19,13 +18,6 @@ const GENSIXURL = 'generation/6/';
 const GENSEVENURL = 'generation/7/';
 const GENEIGHTURL = 'generation/8/';
 const BASEURL = 'https://pokeapi.co/api/v2/';
-let searchPokemon = '';
-//way to search singular pokemon example
-//https://pokeapi.co/api/v2/pokemon/ditto
-//way to search type example
-//https://pokeapi.co/api/v2/type/3
-//way to populate initial table w/ 100 pokemon
-//https://pokeapi.co/api/v2/pokemon?limit=100&offset=0'
 
 const PokemonApp = () => {
     const [hideForm, setHideForm] = useState(false);
@@ -35,32 +27,16 @@ const PokemonApp = () => {
     const [newSearch, setNewSearch] = useState('');
     const [searchPok, setSearchPok] = useState('');
     const [userPokemon, setUserPokemon] = useState({});
-    const [firstGenUrls, setFirstGenUrls] = useState([]);
-    const [firstGenRegionUrls, setFirstGenRegionUrls] = useState([]);
     const [firstGenContent, setFirstGenContent] = useState([]);
-    const [firstTwennyContent, setFirstTwennyContent] = useState([]);   //10
-    const [genTwoUrls, setGenTwoUrls] = useState([]);
-    const [genTwoRegionalUrls, setGenTwoRegionUrls] = useState([])
+    const [firstTwennyContent, setFirstTwennyContent] = useState([]);
     const [genTwoContent, setGenTwoContent] = useState([]);
-    const [genThreeUrls, setGenThreeUrls] = useState([]);
-    const [genThreeRegionalUrls, setGenThreeRegionUrls] = useState([])
     const [genThreeContent, setGenThreeContent] = useState([]);
-    const [genFourUrls, setGenFourUrls] = useState([]);
-    const [genFourRegionalUrls, setGenFourRegionUrls] = useState([])
     const [genFourContent, setGenFourContent] = useState([]);
-    const [genFiveUrls, setGenFiveUrls] = useState([]);                 //20
-    const [genFiveRegionalUrls, setGenFiveRegionUrls] = useState([])
     const [genFiveContent, setGenFiveContent] = useState([]);
-    const [genSixUrls, setGenSixUrls] = useState([]);
-    const [genSixRegionalUrls, setGenSixRegionUrls] = useState([])
     const [genSixContent, setGenSixContent] = useState([]);
-    const [genSevenUrls, setGenSevenUrls] = useState([]);
-    const [genSevenRegionalUrls, setGenSevenRegionUrls] = useState([])
     const [genSevenContent, setGenSevenContent] = useState([]);
-    const [genEightUrls, setGenEightUrls] = useState([]);
-    const [genEightRegionalUrls, setGenEightRegionUrls] = useState([])  //30
     const [genEightContent, setGenEightContent] = useState([]);
-    const [genPok, setGenPok] = useState(0);
+    const [fiveRandos, setFiveRandos] = useState([]);
     const [count, setCount] = useState(0);
 
     //setup initial table
@@ -83,12 +59,8 @@ const PokemonApp = () => {
             let fetchedPokemon = {};
             fetchedPokemon = data.pokemon_species
             const urlMap = fetchedPokemon.map(thePokemon => `${BASEURL}pokemon/${thePokemon.name}`);    //using name to get pokemon url
-            const regionUrlMap = fetchedPokemon.map(thePokemon => thePokemon.url);
             switch(regionNum){
-                case 1: //kanto
-                    setFirstGenUrls(urlMap);
-                    setFirstGenRegionUrls(regionUrlMap);
-                    
+                case 1: //kanto                    
                     //start promise
                     Promise.allSettled(urlMap.map(url =>
                         fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
@@ -101,9 +73,6 @@ const PokemonApp = () => {
                     })
                     break;
                 case 2: //johto
-                    setGenTwoUrls(urlMap);
-                    setGenTwoRegionUrls(regionUrlMap);
-
                     Promise.allSettled(urlMap.map(url =>
                         fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
                     )).then(thePokemon => {
@@ -114,9 +83,6 @@ const PokemonApp = () => {
                     })
                     break;
                 case 3: //hoenn
-                    setGenThreeUrls(urlMap);
-                    setGenThreeRegionUrls(regionUrlMap);
-
                     Promise.allSettled(urlMap.map(url =>
                         fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
                     )).then(thePokemon => {
@@ -127,9 +93,6 @@ const PokemonApp = () => {
                     })
                     break;
                 case 4: //sinnoh
-                    setGenFourUrls(urlMap);
-                    setGenFourRegionUrls(regionUrlMap);
-
                     Promise.allSettled(urlMap.map(url =>
                         fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
                     )).then(thePokemon => {
@@ -140,9 +103,6 @@ const PokemonApp = () => {
                     })
                     break;
                 case 5: //unova
-                    setGenFiveUrls(urlMap);
-                    setGenFiveRegionUrls(regionUrlMap);
-
                     Promise.allSettled(urlMap.map(url =>
                         fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
                     )).then(thePokemon => {
@@ -153,9 +113,6 @@ const PokemonApp = () => {
                     })
                     break;
                 case 6: //kallos
-                    setGenSixUrls(urlMap);
-                    setGenSixRegionUrls(regionUrlMap);
-
                     Promise.allSettled(urlMap.map(url =>
                         fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
                     )).then(thePokemon => {
@@ -166,9 +123,6 @@ const PokemonApp = () => {
                     })
                     break;
                 case 7: //alola
-                    setGenSevenUrls(urlMap);
-                    setGenSevenRegionUrls(regionUrlMap);
-
                     Promise.allSettled(urlMap.map(url =>
                         fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
                     )).then(thePokemon => {
@@ -179,9 +133,6 @@ const PokemonApp = () => {
                     })
                     break;
                 case 8: //galar
-                    setGenEightUrls(urlMap);
-                    setGenEightRegionUrls(regionUrlMap);
-
                     Promise.allSettled(urlMap.map(url =>
                         fetch(url).then(resp => resp.json()) //could do resp.text() for single line info, resp.json() for object info
                     )).then(thePokemon => {
@@ -198,7 +149,6 @@ const PokemonApp = () => {
         }
         getData();
     }
-    
 
     // add new pokemon form toggler
     const hideShowForm = () => {
@@ -211,6 +161,8 @@ const PokemonApp = () => {
         setSearchState(buttonVal);
         if(buttonVal === 1){
             setNewSearch('');
+        } else if(buttonVal === 2){
+            setFiveRandos([]);
         }
     }
 
@@ -222,8 +174,106 @@ const PokemonApp = () => {
 
     const changeGenPok = (buttonVal) => {
         //setGenPok(buttonVal);
+        populateFiveRandos(buttonVal);
         changeSearchState(4);
-        console.log(buttonVal);
+    }
+
+    const populateFiveRandos = (theGen) => {
+        let genMax = 0;
+        //let curGen = [];
+        switch(theGen){
+            case 1:
+                //getmaxmin of gen array, use max min for math.random, use 5 nums to get pokemon and put into array
+                genMax = firstGenContent.length-1
+                for(let i = 0; i < 5; i ++){
+                    let randoPkmnVal = Math.floor(Math.random() * genMax);
+                    let randomPkmn = firstGenContent[randoPkmnVal];
+                    setFiveRandos(fiveRandos => ([
+                        ...fiveRandos,
+                        randomPkmn
+                    ]));
+                }
+                break;
+            case 2:
+                genMax = genTwoContent.length-1
+                for(let i = 0; i < 5; i ++){
+                    let randoPkmnVal = Math.floor(Math.random() * genMax);
+                    let randomPkmn = genTwoContent[randoPkmnVal];
+                    setFiveRandos(fiveRandos => ([
+                        ...fiveRandos,
+                        randomPkmn
+                    ]));
+                }
+                break;
+            case 3:
+                genMax = genThreeContent.length-1
+                for(let i = 0; i < 5; i ++){
+                    let randoPkmnVal = Math.floor(Math.random() * genMax);
+                    let randomPkmn = genThreeContent[randoPkmnVal];
+                    setFiveRandos(fiveRandos => ([
+                        ...fiveRandos,
+                        randomPkmn
+                    ]));
+                }
+                break;
+            case 4:
+                genMax = genFourContent.length-1
+                for(let i = 0; i < 5; i ++){
+                    let randoPkmnVal = Math.floor(Math.random() * genMax);
+                    let randomPkmn = genFourContent[randoPkmnVal];
+                    setFiveRandos(fiveRandos => ([
+                        ...fiveRandos,
+                        randomPkmn
+                    ]));
+                }
+                break;
+            case 5:
+                genMax = genFiveContent.length-1
+                for(let i = 0; i < 5; i ++){
+                    let randoPkmnVal = Math.floor(Math.random() * genMax);
+                    let randomPkmn = genFiveContent[randoPkmnVal];
+                    setFiveRandos(fiveRandos => ([
+                        ...fiveRandos,
+                        randomPkmn
+                    ]));
+                }
+                break;
+            case 6:
+                genMax = genSixContent.length-1
+                for(let i = 0; i < 5; i ++){
+                    let randoPkmnVal = Math.floor(Math.random() * genMax);
+                    let randomPkmn = genSixContent[randoPkmnVal];
+                    setFiveRandos(fiveRandos => ([
+                        ...fiveRandos,
+                        randomPkmn
+                    ]));
+                }
+                break;
+            case 7:
+                genMax = genSevenContent.length-1
+                for(let i = 0; i < 5; i ++){
+                    let randoPkmnVal = Math.floor(Math.random() * genMax);
+                    let randomPkmn = genSevenContent[randoPkmnVal];
+                    setFiveRandos(fiveRandos => ([
+                        ...fiveRandos,
+                        randomPkmn
+                    ]));
+                }
+                break;
+            case 8:
+                genMax = genEightContent.length-1
+                for(let i = 0; i < 5; i ++){
+                    let randoPkmnVal = Math.floor(Math.random() * genMax);
+                    let randomPkmn = genEightContent[randoPkmnVal];
+                    setFiveRandos(fiveRandos => ([
+                        ...fiveRandos,
+                        randomPkmn
+                    ]));
+                }
+                break;
+            default:
+                //shouldn't happen
+        }
     }
 
     //use effect when user searches for pokemon
@@ -232,7 +282,8 @@ const PokemonApp = () => {
         if(isFound === true){
             changeSearchState(3);
         } else{
-            alert(`did not find ${searchPok}`);
+            //alert(`did not find ${searchPok}`);
+            console.log(`did not find ${searchPok}`)
         }
     }, [count])
     
@@ -253,27 +304,17 @@ const PokemonApp = () => {
         return pokeData;
     }
 
-    const regionSelect = (buttonVal) => {
-        switch(buttonVal){
-            case 1:
-                //search link
-                break;
-            default:
-            
-        }
-        //set url to generation
-    }
-
     return (
     <>
         {/* header */}
-        <h1>Pokemon Adoption Center</h1>
+        <h1>Shiny Pokemon Adoption Center</h1>
         {/* pokeheader */}
         <div>
             <NewPokemonHeader hideShowForm={hideShowForm} pokeballImg={pokeballImg} imgAltText={imgAltText} className='pbImg'></NewPokemonHeader>
             <FormSection>
                 {(hideForm && searchState === 0) && <h2>Search Pokemon by:</h2>}
-                {hideForm && <RenderForm changeSearchState={changeSearchState} searchState={searchState} newSearch={newSearch} setNewSearch={setNewSearch} changePok={changePok} searchPok={searchPok} userPokemon={userPokemon} changeGenPok={changeGenPok}></RenderForm>}
+                {hideForm && <RenderForm changeSearchState={changeSearchState} searchState={searchState} newSearch={newSearch} setNewSearch={setNewSearch} changePok={changePok} 
+                searchPok={searchPok} userPokemon={userPokemon} changeGenPok={changeGenPok} fiveRandos={fiveRandos}></RenderForm>}
             </FormSection>
         </div>
         {/* search section */}

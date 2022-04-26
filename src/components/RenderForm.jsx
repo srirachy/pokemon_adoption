@@ -6,7 +6,7 @@ import TableSection from './TableSection';
 import DataCell from './DataCell';
 import DataCellImage from './DataCellImage';
 
-const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok}) => {
+const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, resetFiveRandos}) => {
 
     const formElmts = [];
 
@@ -14,67 +14,76 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
         case 1:
             // searchform -- name searchform -- gen
             formElmts.push( 
-            <form onSubmit={changePok}>
-                <label htmlFor="pokemonSearch">
-                    Name:
-                    <input
-                        type="text"
-                        id="pokemonSearch"
-                        placeholder='Pokemon Name'
-                        value={newSearch}
-                        //onChange={(e) => changePok(e.target.value)}
-                        onChange={(e) => setNewSearch(e.target.value)}
-                    />
-                </label>
-                <button type="submit">Search</button>
-            </form>);
+                <form onSubmit={changePok}>
+                    <label htmlFor='find_pkmn'>
+                        Name:
+                        <input
+                            type='text'
+                            id='find_pkmn'
+                            placeholder='Pokemon Name'
+                            value={newSearch}
+                            //onChange={(e) => changePok(e.target.value)}
+                            onChange={(e) => setNewSearch(e.target.value)}
+                        />
+                    </label>
+                    <button type='submit'>Search</button>
+                </form>);
+            formElmts.push(
+                <Button 
+                key={nanoid()}
+                children='Back'
+                onClick={() => changeSearchState(0)}        
+            />)
             break;
         case 2:
             //searchform -- region 
-            //<img className={className} src={pokeballImg} onClick={() => hideShowForm()} alt={imgAltText}/>
-                       //kanto, johto, hoenn, sinnoh, unova, kalos, alola, galar
-                       formElmts.push(
-                        <Button 
-                            key={nanoid()}
-                            children='Kanto'
-                            onClick={() => changeGenPok(1)}        
-                        />,
-                        <Button 
-                            key={nanoid()}
-                            children='Johto'
-                            onClick={() => changeGenPok(2)}        
-                        />,
-                        <Button 
-                            key={nanoid()}
-                            children='Hoenn'
-                            onClick={() => changeGenPok(3)}        
-                        />,
-                        <Button 
-                            key={nanoid()}
-                            children='Sinnoh'
-                            onClick={() => changeGenPok(4)}        
-                        />,
-                        <Button 
-                            key={nanoid()}
-                            children='Unova'
-                            onClick={() => changeGenPok(5)}        
-                        />,
-                        <Button 
-                            key={nanoid()}
-                            children='Kalos'
-                            onClick={() => changeGenPok(6)}        
-                        />,
-                        <Button 
-                            key={nanoid()}
-                            children='Alola'
-                            onClick={() => changeGenPok(7)}        
-                        />,
-                        <Button 
-                            key={nanoid()}
-                            children='Galar'
-                            onClick={() => changeGenPok(8)}        
-                        />
-                    )
+            //kanto, johto, hoenn, sinnoh, unova, kalos, alola, galar
+            formElmts.push(
+                <Button 
+                    key={nanoid()}
+                    children='Kanto'
+                    onClick={() => changeGenPok(1)}        
+                />,
+                <Button 
+                    key={nanoid()}
+                    children='Johto'
+                    onClick={() => changeGenPok(2)}        
+                />,
+                <Button 
+                    key={nanoid()}
+                    children='Hoenn'
+                    onClick={() => changeGenPok(3)}        
+                />,
+                <Button 
+                    key={nanoid()}
+                    children='Sinnoh'
+                    onClick={() => changeGenPok(4)}        
+                />,
+                <Button 
+                    key={nanoid()}
+                    children='Unova'
+                    onClick={() => changeGenPok(5)}        
+                />,
+                <Button 
+                    key={nanoid()}
+                    children='Kalos'
+                    onClick={() => changeGenPok(6)}        
+                />,
+                <Button 
+                    key={nanoid()}
+                    children='Alola'
+                    onClick={() => changeGenPok(7)}        
+                />,
+                <Button 
+                    key={nanoid()}
+                    children='Galar'
+                    onClick={() => changeGenPok(8)}        
+                />,
+                <Button 
+                    key={nanoid()}
+                    children='Back'
+                    onClick={() => changeSearchState(0)}        
+                />);
             break;
         case 3:
             //data part
@@ -109,23 +118,49 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                     key={nanoid()}
                     children='Reset'
                     onClick={() => changeSearchState(1)}        
-                />
-            );
+                />);
             break;
         case 4:
-            //dropdownlist
+            //generate five randos
+            for (const {name : nameText, sprites: {front_shiny : imgUrl}, types, abilities} of fiveRandos){
+                formElmts.push(
+                    <TableSection className='five_randos'>
+                        <tr key={nanoid()}>
+                            <DataCell>
+                                <Button 
+                                    key={nanoid()}
+                                    children='Add'
+                                    //onClick={() => addToTable())}        
+                                />
+                            </DataCell>
+                            <DataCell>
+                                {nameText}
+                            </DataCell>
+                            <DataCellImage
+                                imgUrl={imgUrl}
+                                altText={nameText}
+                            />
+                            <DataCell>
+                                <ul> 
+                                    {types[0] && <li>{types[0].type.name}</li>} {types[1] && <li>{types[1].type.name}</li>}
+                                </ul>
+                            </DataCell>
+                            <DataCell>
+                                <ul>
+                                    {abilities[0] && <li>{abilities[0].ability.name}</li>} {abilities[1] && <li>{abilities[1].ability.name}</li>} {abilities[2] && <li>{abilities[2].ability.name}</li>}
+                                </ul>
+                            </DataCell>
+                            {/* add datacfell for region */}
+                        </tr>
+                    </TableSection>
+                )
+            };
             formElmts.push(
-                <p>yo</p>
-                // <form>
-                //     <b>select pokemon from list</b>
-                //     <select id='myList' onChange={() => changePok()}>
-                //         {firstGenPokemon.map((thePokemon) => (
-                //             <option value={thePokemon.name}>{thePokemon.name}</option>
-                //         ))}
-                //         {/* <RenderOptions firstGenPokemon={firstGenPokemon} genPok={genPok}/> */}
-                //     </select>
-                // </form>
-            )
+                <Button 
+                    key={nanoid()}
+                    children='Back'
+                    onClick={() => changeSearchState(2)}        
+                />);
             break;
         default:
             //initial menu -> user selects button -- name/gen
@@ -138,7 +173,7 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                        onClick={() => changeSearchState(value)}
                    />
                 )
-            }
+            };
             break;
     };
     return formElmts;

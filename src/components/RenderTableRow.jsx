@@ -1,6 +1,7 @@
 import React from 'react';
 import DataCell from './DataCell'
 import DataCellImage from './DataCellImage';
+import Button from './Button'
 import {nanoid} from 'nanoid';
 
 
@@ -27,7 +28,13 @@ const RenderImages = ({firstTwennyContent}) => {
                         {abilities[0] && <li>{abilities[0].ability.name}</li>} {abilities[1] && <li>{abilities[1].ability.name}</li>} {abilities[2] && <li>{abilities[2].ability.name}</li>}
                     </ul>
                 </DataCell>
-                {/* add datacfell for region */}
+                <DataCell>
+                    <Button 
+                        key={nanoid()}
+                        children='Remove'
+                        //onClick={() => removePkmn()}        
+                    />
+                </DataCell>
             </tr>
         )
     };
