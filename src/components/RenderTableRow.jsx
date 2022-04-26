@@ -9,14 +9,13 @@ const RenderImages = ({firstTwennyContent}) => {
 
     for (const {name : nameText, sprites: {front_shiny : imgUrl}, types, abilities} of firstTwennyContent){
         imgElmts.push(
-            <tr>
+            <tr key={nanoid()}>
                 <DataCell>
                     {nameText}
                 </DataCell>
                 <DataCellImage
                     imgUrl={imgUrl}
                     altText={nameText}
-                    key={nanoid()}
                 />
                 <DataCell>
                     <ul> 

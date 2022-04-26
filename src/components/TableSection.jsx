@@ -1,9 +1,9 @@
 import React from 'react';
 
-const TableSection = ({children}) => {
+const TableSection = ({children, className}) => {
     return (
         <>
-        <section className="pokTable">
+        <section className={className}>
             <table>
                 <tbody>
                     {children}
