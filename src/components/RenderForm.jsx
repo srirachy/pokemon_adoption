@@ -6,7 +6,7 @@ import TableSection from './TableSection';
 import DataCell from './DataCell';
 import DataCellImage from './DataCellImage';
 
-const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, resetFiveRandos}) => {
+const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, addPkmn, addMultiplePkmn}) => {
 
     const formElmts = [];
 
@@ -112,7 +112,7 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                 <Button 
                     key={nanoid()}
                     children='Add'
-                    onClick={() => changeSearchState(0)}        
+                    onClick={() => addPkmn()}        
                 />,
                 <Button 
                     key={nanoid()}
@@ -124,13 +124,12 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
             //generate five randos
             for (const {name : nameText, sprites: {front_shiny : imgUrl}, types, abilities} of fiveRandos){
                 formElmts.push(
-                    <TableSection className='five_randos'>
                         <tr key={nanoid()}>
                             <DataCell>
                                 <Button 
                                     key={nanoid()}
                                     children='Add'
-                                    //onClick={() => addToTable())}        
+                                    onClick={() => addMultiplePkmn(nameText)}        
                                 />
                             </DataCell>
                             <DataCell>
@@ -152,7 +151,6 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                             </DataCell>
                             {/* add datacfell for region */}
                         </tr>
-                    </TableSection>
                 )
             };
             formElmts.push(

@@ -5,10 +5,10 @@ import Button from './Button'
 import {nanoid} from 'nanoid';
 
 
-const RenderImages = ({firstTwennyContent}) => {
+const RenderImages = ({tableContent, removePkmn}) => {
     const imgElmts = [];
 
-    for (const {name : nameText, sprites: {front_shiny : imgUrl}, types, abilities} of firstTwennyContent){
+    for (const {name : nameText, sprites: {front_shiny : imgUrl}, types, abilities} of tableContent){
         imgElmts.push(
             <tr key={nanoid()}>
                 <DataCell>
@@ -31,8 +31,8 @@ const RenderImages = ({firstTwennyContent}) => {
                 <DataCell>
                     <Button 
                         key={nanoid()}
-                        children='Remove'
-                        //onClick={() => removePkmn()}        
+                        children='x'
+                        onClick={() => removePkmn(nameText)}        
                     />
                 </DataCell>
             </tr>
