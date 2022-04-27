@@ -1,11 +1,11 @@
-// *{
-//     height: 100%;
-// }
+
 
 .pbImg{
     height: 100%;
     width: 30px;
     margin-left: 10px;
+    margin-top: 10px;
+    
 }
 th, td {
     border-bottom: 1px solid;
@@ -14,20 +14,76 @@ th, td {
 
 table {
       width: 100%;
+        
   }
+
+.search_five_randos table{
+        display: flex;
+        align-items: center;
+}
 
 th {
     text-align: center;
     background-color: #006EB6;
     color: #FFCC01;
+    padding: 10px;
+    border-radius: 6px;
   }
 
 h2 {
-    display: inline-block;
-    border: 2px solid #006EB6;
+  text-align: center;
     // background-color: #ffe373;
     color: #006EB6;
+    font-family: 'Russo One', sans-serif;
+    // -webkit-text-stroke-width: .25px;
+    //  -webkit-text-stroke-color: #FFCC01;
 }
+h1 {
+  font-family: 'Pokemon Solid', sans-serif;
+  color: #FFCC01;
+  -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: #006EB6;
+  font-size: 50px;
+  text-align: center;
+  padding-top: -10px;
+}
+
 ul {
   list-style-type: none;
+  
 }
+
+button {
+  border-radius: 10px;
+
+}
+
+section {
+ 
+  text-align: center;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+    button {
+      margin: 2px;
+      margin-top: 2px;
+      
+    }
+}
+
+input {
+  border-radius: 10px;
+  font-family: 'Russo One', sans-serif;  
+}
+
+label {
+  padding: 2px;
+  font-family: 'Russo One', sans-serif;
+}
+
+button {
+  font-family: 'Russo One', sans-serif;
+}
+
+
