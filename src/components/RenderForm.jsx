@@ -6,7 +6,7 @@ import TableSection from './TableSection';
 import DataCell from './DataCell';
 import DataCellImage from './DataCellImage';
 
-const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, addPkmn, addMultiplePkmn, isDisabled}) => {
+const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, addPkmn, addGenPkmn, isDisabled}) => {
 
     const formElmts = [];
 
@@ -14,7 +14,7 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
         case 1:
             // searchform -- name searchform -- gen
             formElmts.push(
-                // nanoid backfired, had to use generic key
+                // nanoid backfired and caused warnings, used generic key for fix
                 <form onSubmit={changePok} key='1_form'>    
                     <label htmlFor='find_pkmn'>
                         Name:
@@ -36,8 +36,7 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
             />)
             break;
         case 2:
-            //searchform -- region 
-            //kanto, johto, hoenn, sinnoh, unova, kalos, alola, galar
+            //searchform -- generation/region 
             formElmts.push(
                 <Button 
                     key={nanoid()}
@@ -112,7 +111,7 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                 <Button 
                     key='2_table'
                     children='Add'
-                    onClick={() => addPkmn()}        
+                    onClick={() => addPkmn(userPokemon.name)}        
                 />,
                 <Button 
                     key='3_table'
@@ -129,7 +128,7 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                                 <Button 
                                     key={nanoid()}
                                     children='Add'
-                                    onClick={() => addMultiplePkmn(nameText)}        
+                                    onClick={() => addGenPkmn(nameText)}        
                                 />
                             </DataCell>
                             <DataCell>
@@ -149,7 +148,6 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                                     {abilities[0] && <li>{abilities[0].ability.name}</li>} {abilities[1] && <li>{abilities[1].ability.name}</li>} {abilities[2] && <li>{abilities[2].ability.name}</li>}
                                 </ul>
                             </DataCell>
-                            {/* add datacfell for region */}
                         </tr>
                 )
             };

@@ -9,7 +9,6 @@ const SearchField = ({curFilter, handleFilter}) => {
                     id='search_adopted_pkmn'
                     placeholder='Pokemon Name'
                     value={curFilter}
-                    //onChange={(e) => changePok(e.target.value)}
                     onChange={(e) => handleFilter(e.target.value)}
                 />
             </label>);
