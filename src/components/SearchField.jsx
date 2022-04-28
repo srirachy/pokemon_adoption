@@ -1,17 +1,17 @@
 import React from 'react';
 
-const SearchField = () => {
+const SearchField = ({curFilter, handleFilter}) => {
 
-    return (<label htmlFor='adopted_pkmn'>
-                {/* Name:
+    return (<label htmlFor='search_adopted_pkmn'>
+                View/Search Pokemon
                 <input
                     type='text'
-                    id='pkmn_search'
+                    id='search_adopted_pkmn'
                     placeholder='Pokemon Name'
-                    value={newSearch}
+                    value={curFilter}
                     //onChange={(e) => changePok(e.target.value)}
-                    onChange={(e) => setNewSearch(e.target.value)}
-                /> */}
+                    onChange={(e) => handleFilter(e.target.value)}
+                />
             </label>);
 }          
                 

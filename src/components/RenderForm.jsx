@@ -6,7 +6,7 @@ import TableSection from './TableSection';
 import DataCell from './DataCell';
 import DataCellImage from './DataCellImage';
 
-const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, resetFiveRandos}) => {
+const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, addPkmn, addMultiplePkmn, isDisabled}) => {
 
     const formElmts = [];
 
@@ -21,14 +21,14 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                             id='find_pkmn'
                             placeholder='Pokemon Name'
                             value={newSearch}
-                            //onChange={(e) => changePok(e.target.value)}
                             onChange={(e) => setNewSearch(e.target.value)}
                         />
                     </label>
-                    <button type='submit'>Search</button>
+                    <button type='submit' disabled={isDisabled}>Search</button>
                 </form>);
             formElmts.push(
                 <Button 
+                className='backBu'
                 key={nanoid()}
                 children='Back'
                 onClick={() => changeSearchState(0)}        
@@ -78,7 +78,8 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                     children='Galar'
                     onClick={() => changeGenPok(8)}        
                 />,
-                <Button className='backk'
+                <Button 
+                    className='backBu'
                     key={nanoid()}
                     children='Back'
                     onClick={() => changeSearchState(0)}        
@@ -111,9 +112,10 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                 <Button 
                     key={nanoid()}
                     children='Add'
-                    onClick={() => changeSearchState(0)}        
+                    onClick={() => addPkmn()}        
                 />,
                 <Button 
+                    className='backBu'
                     key={nanoid()}
                     children='Reset'
                     onClick={() => changeSearchState(1)}        
@@ -128,7 +130,7 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                                 <Button 
                                     key={nanoid()}
                                     children='Add'
-                                    //onClick={() => addToTable())}        
+                                    onClick={() => addMultiplePkmn(nameText)}        
                                 />
                             </DataCell>
                             <DataCell>
@@ -152,12 +154,6 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                         </tr>
                 )
             };
-            formElmts.push(
-                <Button 
-                    key={nanoid()}
-                    children='Back'
-                    onClick={() => changeSearchState(2)}        
-                />);
             break;
         default:
             //initial menu -> user selects button -- name/gen

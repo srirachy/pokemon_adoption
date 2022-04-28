@@ -1,43 +1,40 @@
-
-
-.pbImg{
-    height: 100%;
-    width: 30px;
-    margin-left: 10px;
-    margin-top: 10px;
-    
+* {
+  background-color: #d7f6ff;
 }
-th, td {
-    border-bottom: 1px solid;
-    text-align: center;
-  }
-
+// styling for inital/add new pokemon table
 table {
-      width: 100%;
-        
-  }
-
-.search_five_randos table{
-        display: flex;
-        align-items: center;
+  width: 100%;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  text-transform: capitalize;
 }
 
 th {
-    text-align: center;
-    background-color: #006EB6;
-    color: #FFCC01;
-    padding: 10px;
-    border-radius: 6px;
-  }
-
-h2 {
   text-align: center;
-    // background-color: #ffe373;
-    color: #006EB6;
-    font-family: 'Russo One', sans-serif;
-    // -webkit-text-stroke-width: .25px;
-    //  -webkit-text-stroke-color: #FFCC01;
+  background-color: #006EB6;
+  color: #FFCC01;
+  padding: 10px;
+  border-radius: 6px;
+  border: solid 2px #FFCC01;
+  font-family: 'Russo One', sans-serif;
+  font-size: 15px;
 }
+
+ul {
+  list-style-type: none;
+}
+
+th, td {
+  border-bottom: 1px solid;
+  text-align: center;
+}
+
+.search_five_randos table{
+  display: flex;
+  align-items: center;
+}
+
+// add new pokemon section styling
 h1 {
   font-family: 'Pokemon Solid', sans-serif;
   color: #FFCC01;
@@ -48,33 +45,53 @@ h1 {
   padding-top: -10px;
 }
 
-ul {
-  list-style-type: none;
-  
+.pbImg{
+  height: 100%;
+  width: 30px;
+  margin-left: 10px;
+  margin-top: 10px;   
 }
 
-button {
-  border-radius: 10px;
-
+h2 {
+  text-align: center;
+  color: #006EB6;
+  font-family: 'Russo One', sans-serif; 
+  margin-right: 3px;
+}
+p {
+  text-align: center;
+  color: red;
 }
 
 section {
- 
   text-align: center;
   margin-right: 10px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
     button {
       margin: 2px;
       margin-top: 2px;
-      
+      font-family: 'Russo One', sans-serif;
     }
+}
+
+  // button styling
+
+button {
+  border-radius: 10px;
+  width: 100px;
+  background-color: #f5f5f5;
+
 }
 
 input {
   border-radius: 10px;
   font-family: 'Russo One', sans-serif;  
+  margin-left: 5px;  
+  background-color: #f5f5f5;
+
 }
 
 label {
@@ -82,8 +99,37 @@ label {
   font-family: 'Russo One', sans-serif;
 }
 
-button {
-  font-family: 'Russo One', sans-serif;
+.backBu {
+  background-color: #7e7e7e;
+  margin-left: 5px;
+  color: white;
 }
+.randoBut {
+  background-color: #7e7e7e;
+  margin-bottom: 10px;
+  color: white;
+  font-family: 'Russo One', sans-serif;
+  text-align: center;
+  margin-left: 35rem ;
+}
+
+.search_pkmn {
+  td {
+ border-bottom: 0;}
+}
+
+.xButton {
+  width: 23px;
+}
+
+
+
+
+
+
+
+
+
+
 
 
