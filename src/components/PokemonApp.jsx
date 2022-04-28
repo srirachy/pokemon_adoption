@@ -214,7 +214,10 @@ const PokemonApp = () => {
     //event handler for filter pokemon field
     const handleFilter = (filter) => {
         setCurFilter(filter);
-        const filtered = [...tableState].filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+        //filter by name, first type, or first ability
+        const filtered = [...tableState].filter(p => p.name.toLowerCase().includes(filter.toLowerCase()) 
+        || p.types[0].type.name.toLowerCase().includes(filter.toLowerCase())
+        || p.abilities[0].ability.name.toLowerCase().includes(filter.toLowerCase()));
         setTableContent(filtered);
     }
 
@@ -280,7 +283,7 @@ const PokemonApp = () => {
 
     //remove pokemon from table
     const removePkmn = (pkmnName) => {
-        const filtered = [...tableState].filter(p => p.name.toLowerCase() !== pkmnName.toLowerCase());
+        const filtered = [...tableState].filter(p => (p.name.toLowerCase() !== pkmnName.toLowerCase()));
         setTableState(filtered);
         setTableContent(filtered);
     }
