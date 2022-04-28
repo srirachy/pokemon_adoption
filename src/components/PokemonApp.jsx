@@ -46,6 +46,7 @@ const PokemonApp = () => {
     const [alreadyExists, setAlreadyExists] = useState(false);
     const [tableContent, setTableContent] = useLocalStorage('pkmns', '');   //table the user views
     const [tableState, setTableState] = useState(tableContent);             //holds table state for filtering
+    const [cannotAddPkmnName, setCannotAddPkmnName] = useState('');
     const [firstGenContent, setFirstGenContent] = useState([]);
     const [genTwoContent, setGenTwoContent] = useState([]);
     const [genThreeContent, setGenThreeContent] = useState([]);
@@ -74,15 +75,16 @@ const PokemonApp = () => {
 
     //if user pokemon found, change search state to the data view
     useEffect(() => {
-        if(isFound === true && alreadyExists === false){
+        if(isFound === true){
             changeSearchState(3);
         }
-    }, [isFound, alreadyExists])
+    }, [isFound])
 
     //reset searchPok when changing views from adding pokemon (mostly for warning message if pokemon not found)
     useEffect(() => {
         if (searchState !== 2){
             setSearchPok('');
+            setCannotAddPkmnName('');
         }
     }, [searchState])
 
@@ -219,14 +221,8 @@ const PokemonApp = () => {
     //event handler for single search pokemon
     const changePok = (e) => {
         e.preventDefault();
-        const thePkmn = filterAll(newSearch);
-        const inTable = checkTable(thePkmn);
-        if (inTable === true){
-            setAlreadyExists(inTable);
-        } else{
-            setSearchPok(newSearch);
-            setCount(prevCount => prevCount + 1);
-        }
+        setSearchPok(newSearch);
+        setCount(prevCount => prevCount + 1);
     }
 
     //call function to populate state w/ five random pokemon from user chosen generation
@@ -238,47 +234,36 @@ const PokemonApp = () => {
     //add single pokemon
     const addPkmn = (pkmnName) => {
         const thePkmn = filterAll(pkmnName);
-        //console data for debugging
-        console.log('from addPkmn:')
-        console.log(thePkmn);
-        const inTable = checkTable(thePkmn);
-        if (inTable === true){
-            setAlreadyExists(inTable);
-        } else{
-            //add to table state
+        const isInTable = checkTable(thePkmn.name);
+        setAlreadyExists(isInTable);
+        if (isInTable === false){
             addToState(thePkmn);
-            //reset
-            setAlreadyExists(inTable);
-            changeSearchState(0);
+            setCannotAddPkmnName('');
+            changeSearchState(0);   //main difference between addpkmn and addgenpkmn
+        } else{
+            setCannotAddPkmnName(pkmnName);
         }
     }
 
     //same above but for generation
     const addGenPkmn = (pkmnName) => {
         const thePkmn = filterAll(pkmnName);
-        //console data for debugging
-        console.log('from genPkmn:')
-        console.log(thePkmn);
-        const inTable = checkTable(thePkmn);
-        setUserPokemon(pkmnName);
-        if(inTable === true){
-            setAlreadyExists(inTable);
-        } else{
-            setAlreadyExists(inTable);
-            setUserPokemon('');
+        const isInTable = checkTable(thePkmn.name);
+        setIsFound(false);  //mostly for gen search reasons
+        setAlreadyExists(isInTable);
+        if (isInTable === false){
             addToState(thePkmn);
+            setCannotAddPkmnName('');
+        } else{
+            setCannotAddPkmnName(pkmnName);
         }
     }
 
     // helper to check if pokemon already exists in adopted table view
-    const checkTable = (pkmnData) => {
-        let doesExist = false;
-        if (tableContent.includes(pkmnData)){
-            doesExist = true;
-        } else{
-            doesExist = false;
-        }
-        return doesExist;
+    const checkTable = (pkmnName) => {
+        return tableContent.some(function(pkmn){
+            return pkmn.name === pkmnName;
+        })
     };
 
     // adds pokemon to table state and table content
@@ -539,9 +524,9 @@ const PokemonApp = () => {
                     <RenderForm changeSearchState={changeSearchState} searchState={searchState} fiveRandos={fiveRandos} addGenPkmn={addGenPkmn}></RenderForm></TableSection>}
             </FormSection>
             {/* notify user if pokemon was not found */}
-            {(!isFound && searchPok) && <p color='red'>Unable to find {searchPok}</p>}
+            {(!isFound && searchPok) && <p color='red'>Unable to find {searchPok}!</p>}
             {/* notify user if pokemon already exists in adopted table */}
-            {(alreadyExists && (searchState === 4 || searchState === 3)) && <p>{userPokemon} already exists</p>}
+            {(alreadyExists && cannotAddPkmnName && (searchState === 4 || searchState === 3)) && <p color='red'>{cannotAddPkmnName} is already adopted!</p>}
             {(hideForm && searchState === 4) && <Button key={nanoid()} children='Back' onClick={() => changeSearchState(2)}></Button>}
         </div>
         {/* filter section */}

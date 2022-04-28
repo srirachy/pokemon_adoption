@@ -148,7 +148,6 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                                     {abilities[0] && <li>{abilities[0].ability.name}</li>} {abilities[1] && <li>{abilities[1].ability.name}</li>} {abilities[2] && <li>{abilities[2].ability.name}</li>}
                                 </ul>
                             </DataCell>
-                            {/* add datacfell for region */}
                         </tr>
                 )
             };
