@@ -5,8 +5,10 @@ import SearchField from './SearchField';
 import RenderForm from './RenderForm';
 import TableSection from './TableSection';
 import RenderTableRow from './RenderTableRow';
+import Button from './Button'
 import emptyPbImg from "../img/empty_pokeball.svg";
 import colorPbImg from "../img/color_pokeball.svg";
+import {nanoid} from 'nanoid';
 import '../scss/index.scss';
 
 const GENONEURL = 'generation/1/';
@@ -18,6 +20,11 @@ const GENSIXURL = 'generation/6/';
 const GENSEVENURL = 'generation/7/';
 const GENEIGHTURL = 'generation/8/';
 const BASEURL = 'https://pokeapi.co/api/v2/';
+//list of pokemon 404'ing in api
+const excludeList = ['deoxys', 'wormadam', 'giratina', 'shaymin', 'wormadam', 'giratina', 'shaymin', 
+'basculin', 'darmanitan', 'thundurus', 'tornadus', 'keldeo', 'landorus', 'meloetta', 'aegislash', 
+'meowstic', 'pumpkaboo', 'zygarde', 'gourgeist', 'morpeko', 'indeedee', 'eiscue', 'toxtricity', 'urshifu',
+'oricorio', 'wishiwashi', 'lycanroc', 'minior', 'mimikyu', 'oricorio']
 
 const PokemonApp = () => {
     const [count, setCount] = useState(0);                  //counter for search
@@ -25,8 +32,9 @@ const PokemonApp = () => {
     const [sortCount, setSortCount] = useState(0);          //counter for sorts
     const [sortCount2, setSortCount2] = useState(0);
     const [sortCount3, setSortCount3] = useState(0);
+    const [isDisabled, setIsDisabled] = useState(true);
     const [hideForm, setHideForm] = useState(false);
-    const [pokeballImg, setPokeballImg] = useState(emptyPbImg);
+    const [pokeballImg, setPokeballImg] = useState(emptyPbImg); //hide/show toggle img button
     const [imgAltText, setImgAltText] = useState('show form');
     const [searchState, setSearchState] = useState(0);
     const [newSearch, setNewSearch] = useState('');
@@ -62,15 +70,28 @@ const PokemonApp = () => {
         findPokemon(searchPok);
     }, [count, searchPok])
 
-    //if user pokemon found, then change state else mini error message
+    //if user pokemon found, change search state to the data view
     useEffect(() => {
         if(isFound === true){
             changeSearchState(3);
-        } else{
-            //alert(`did not find ${searchPok}`);
-            console.log(`did not find ${searchPok}`)
         }
     }, [isFound])
+
+    //reset searchPok when changing views from adding pokemon (mostly for warning message if pokemon not found)
+    useEffect(() => {
+        if (searchState !== 2){
+            setSearchPok('');
+        }
+    }, [searchState])
+
+    //disable search if add field is empty
+    useEffect(() => {
+        if (newSearch.length > 0){
+            setIsDisabled(false);
+        } else{
+            setIsDisabled(true);
+        }
+    }, [newSearch])
 
     //initial load of all pokemon according to their generation
     const loadGen = (genUrl, regionNum) => {
@@ -78,7 +99,8 @@ const PokemonApp = () => {
             const res = await fetch(BASEURL + genUrl);
             const data = await res.json();
             let fetchedPokemon = {};
-            fetchedPokemon = data.pokemon_species
+            //fetch pokemon but exclude the ones 404'ing in the api
+            fetchedPokemon = data.pokemon_species.filter(thePokemon => !excludeList.includes(thePokemon.name));
             const urlMap = fetchedPokemon.map(thePokemon => `${BASEURL}pokemon/${thePokemon.name}`);    //using name to get pokemon url
             switch(regionNum){
                 case 1: //kanto                    
@@ -324,7 +346,7 @@ const PokemonApp = () => {
                     ]));
                 }
                 break;
-            case 8:
+            default:    //gen 8 by default
                 genMax = genEightContent.length-1
                 for(let i = 0; i < 5; i ++){
                     let randoPkmnVal = Math.floor(Math.random() * genMax);
@@ -334,12 +356,10 @@ const PokemonApp = () => {
                         randomPkmn
                     ]));
                 }
-                break;
-            default:
-                //shouldn't happen
         }
     }
     
+    // find user selected pokemon
     const findPokemon = (curPokemon) => {
         const foundPokemon = filterAll(curPokemon);
         let didFind = false;
@@ -350,6 +370,7 @@ const PokemonApp = () => {
         setIsFound(didFind);
     }
 
+    //helper to find pokemon regardless of generation
     const filterAll = (curPokemon) => {
         const pokeData = [...firstGenContent, ...genTwoContent, ...genThreeContent, ...genFourContent, ...genFiveContent, 
             ...genSixContent, ...genSevenContent, ...genEightContent].find(({name}) => name === curPokemon);
@@ -357,6 +378,7 @@ const PokemonApp = () => {
         return pokeData;
     }
 
+    //helper to sort pokemon by name
     const handleSortName = () => {
         const initPok = [...tableContent]
         if (sortCount % 3 === 2){
@@ -372,6 +394,7 @@ const PokemonApp = () => {
         setSortCount3(0);
     };
 
+    //helper to sort pokemon by type
     const handleSortType = () => {
         const initPok = [...tableContent]
         if (sortCount2 % 3 === 2){
@@ -386,6 +409,7 @@ const PokemonApp = () => {
         setSortCount3(0);
     };
 
+    //helper to sort pokemon by ability
     const handleSortAb = () => {
         const initPok = [...tableContent]
         if (sortCount3 % 3 === 2){
@@ -400,22 +424,23 @@ const PokemonApp = () => {
         setSortCount3(prevCount => prevCount+1);
     };
 
+    //helper to sort ascending
     const sortAsc = (sortPok, sortNum) => {
         let nameA = ''
         let nameB = ''
         const sortedPok = sortPok.sort(function (a, b) {
             switch (sortNum) {
                 case 1:
-                    nameA = a.types[0].type.name.toLowerCase(); // ignore upper and lowercase
-                    nameB = b.types[0].type.name.toLowerCase(); // ignore upper and lowercase
+                    nameA = a.types[0].type.name.toLowerCase();
+                    nameB = b.types[0].type.name.toLowerCase();
                     break;
                 case 2:
-                    nameA = a.abilities[0].ability.name.toLowerCase(); // ignore upper and lowercase
-                    nameB = b.abilities[0].ability.name.toLowerCase(); // ignore upper and lowercase
+                    nameA = a.abilities[0].ability.name.toLowerCase();
+                    nameB = b.abilities[0].ability.name.toLowerCase();
                     break;
                 default:
-                    nameA = a.name.toLowerCase(); // ignore upper and lowercase
-                    nameB = b.name.toLowerCase(); // ignore upper and lowercase
+                    nameA = a.name.toLowerCase();
+                    nameB = b.name.toLowerCase();
 
             };
             if (nameA < nameB) {
@@ -430,22 +455,23 @@ const PokemonApp = () => {
         setTableContent(sortedPok);
     }
 
+    //helper to sort descending
     const sortDesc = (sortPok, sortNum) => {
         let nameA = '';
         let nameB = '';
         const sortedPok = sortPok.sort(function (a, b) {
             switch (sortNum) {
                 case 1:
-                    nameA = a.types[0].type.name.toLowerCase(); // ignore upper and lowercase
-                    nameB = b.types[0].type.name.toLowerCase(); // ignore upper and lowercase
+                    nameA = a.types[0].type.name.toLowerCase();
+                    nameB = b.types[0].type.name.toLowerCase();
                     break;
                 case 2:
-                    nameA = a.abilities[0].ability.name.toLowerCase(); // ignore upper and lowercase
-                    nameB = b.abilities[0].ability.name.toLowerCase(); // ignore upper and lowercase
+                    nameA = a.abilities[0].ability.name.toLowerCase();
+                    nameB = b.abilities[0].ability.name.toLowerCase();
                     break;
                 default:
-                    nameA = a.name.toLowerCase(); // ignore upper and lowercase
-                    nameB = b.name.toLowerCase(); // ignore upper and lowercase
+                    nameA = a.name.toLowerCase();
+                    nameB = b.name.toLowerCase();
 
             };
             if (nameA > nameB) {
@@ -470,20 +496,21 @@ const PokemonApp = () => {
             <FormSection>
                 {(hideForm && searchState === 0) && <h2>Search Pokemon by:</h2>}
                 {(hideForm && searchState !== 4) && <RenderForm changeSearchState={changeSearchState} searchState={searchState} newSearch={newSearch} setNewSearch={setNewSearch} changePok={changePok} 
-                searchPok={searchPok} userPokemon={userPokemon} changeGenPok={changeGenPok} addPkmn={addPkmn}></RenderForm>}
+                searchPok={searchPok} userPokemon={userPokemon} changeGenPok={changeGenPok} addPkmn={addPkmn} isDisabled={isDisabled}></RenderForm>}
                 {/* mostly for when searching 5 randos -- add table */}
                 {(hideForm && searchState === 4) && <TableSection className='search_five_randos'>
                     <tr><th>Add</th><th>Name</th><th>Image</th><th>Type</th><th>Ability</th></tr>
                     <RenderForm changeSearchState={changeSearchState} searchState={searchState} fiveRandos={fiveRandos} addMultiplePkmn={addMultiplePkmn}></RenderForm></TableSection>}
             </FormSection>
+            {(hideForm && searchState === 4) && <Button key={nanoid()} children='Back' onClick={() => changeSearchState(2)}></Button>}
             {/* let user know if pokemon was not found */}
-            {(!isFound && newSearch) && <p>Unable to find {newSearch}</p>}
+            {(!isFound && searchPok) && <p color='red'>Unable to find {searchPok}</p>}
         </div>
         {/* filter section */}
         <SearchField curFilter={curFilter} handleFilter={handleFilter}></SearchField>
         {/* table section */}
         <TableSection className='adopted_pkmn'>
-            {tableContent && <tr ><th id="text" onClick={handleSortName}>Name</th><th >Image</th><th id="text" onClick={handleSortType}>Type</th><th id='text' onClick={handleSortAb}>Ability</th><th>Remove</th></tr>}
+            {tableContent && <tr><th id="text" onClick={handleSortName}>Name</th><th >Image</th><th id="text" onClick={handleSortType}>Type</th><th id='text' onClick={handleSortAb}>Ability</th><th>Remove</th></tr>}
             {tableContent && <RenderTableRow tableContent={tableContent} removePkmn={removePkmn}></RenderTableRow>}
         </TableSection>
     </> 
