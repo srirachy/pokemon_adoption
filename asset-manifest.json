@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/pokemon_adoption/static/css/main.78947e80.css",
-    "main.js": "/pokemon_adoption/static/js/main.e8835fbd.js",
+    "main.js": "/pokemon_adoption/static/js/main.513a0428.js",
     "static/js/787.c5f5144a.chunk.js": "/pokemon_adoption/static/js/787.c5f5144a.chunk.js",
     "static/media/color_pokeball.svg": "/pokemon_adoption/static/media/color_pokeball.c7addba3e69e8d2db12dbbc8dade0406.svg",
     "static/media/empty_pokeball.svg": "/pokemon_adoption/static/media/empty_pokeball.3393942af867e70fa9534d682e1b9def.svg",
     "index.html": "/pokemon_adoption/index.html",
     "main.78947e80.css.map": "/pokemon_adoption/static/css/main.78947e80.css.map",
-    "main.e8835fbd.js.map": "/pokemon_adoption/static/js/main.e8835fbd.js.map",
+    "main.513a0428.js.map": "/pokemon_adoption/static/js/main.513a0428.js.map",
     "787.c5f5144a.chunk.js.map": "/pokemon_adoption/static/js/787.c5f5144a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.78947e80.css",
-    "static/js/main.e8835fbd.js"
+    "static/js/main.513a0428.js"
   ]
 }
