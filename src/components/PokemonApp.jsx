@@ -20,6 +20,10 @@ const GENFIVEURL = 'generation/5/';
 const GENSIXURL = 'generation/6/';
 const GENSEVENURL = 'generation/7/';
 const GENEIGHTURL = 'generation/8/';
+const MENUSTATE = 0;
+const GENBUTTONSTATE = 2;
+const ADDPKMNDATASTATE = 3;
+const GENFIVERANDOSTATE = 4;
 const BASEURL = 'https://pokeapi.co/api/v2/';
 //list of pokemon 404'ing in api
 const excludeList = ['deoxys', 'wormadam', 'giratina', 'shaymin', 'wormadam', 'giratina', 'shaymin', 
@@ -37,7 +41,7 @@ const PokemonApp = () => {
     const [hideForm, setHideForm] = useState(false);
     const [pokeballImg, setPokeballImg] = useState(emptyPbImg); //hide/show toggle img button
     const [imgAltText, setImgAltText] = useState('show form');
-    const [searchState, setSearchState] = useState(0);
+    const [searchState, setSearchState] = useState(MENUSTATE);
     const [newSearch, setNewSearch] = useState('');
     const [searchPok, setSearchPok] = useState('');
     const [userPokemon, setUserPokemon] = useState({});
@@ -76,13 +80,13 @@ const PokemonApp = () => {
     //if user pokemon found, change search state to the data view
     useEffect(() => {
         if(isFound === true){
-            changeSearchState(3);
+            changeSearchState(ADDPKMNDATASTATE);
         }
     }, [isFound])
 
     //reset searchPok when changing views from adding pokemon (mostly for warning message if pokemon not found)
     useEffect(() => {
-        if (searchState !== 2){
+        if (searchState !== GENBUTTONSTATE){
             setSearchPok('');
             setCannotAddPkmnName('');
         }
@@ -114,8 +118,6 @@ const PokemonApp = () => {
                     )).then(thePokemon => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);
                         setFirstGenContent(successfulPromises); //set all content of first 151 pokemon
-                        //setTableContent(successfulPromises.slice(0, 19)); //set first twenty pokemon content
-                        //setTableState(successfulPromises.slice(0, 19));
                     }).catch(function(err){
                         console.log(err.message);
                     })
@@ -203,10 +205,12 @@ const PokemonApp = () => {
 
     // change views for adding pokemon section
     const changeSearchState = (buttonVal) => {
+        const nameButton = 1;
+        const generationButton = 2;
         setSearchState(buttonVal);
-        if(buttonVal === 1){
+        if(buttonVal === nameButton){
             setNewSearch('');
-        } else if(buttonVal === 2){
+        } else if(buttonVal === generationButton){
             setFiveRandos([]);
         }
     }
@@ -231,7 +235,7 @@ const PokemonApp = () => {
     //call function to populate state w/ five random pokemon from user chosen generation
     const changeGenPok = (buttonVal) => {
         populateFiveRandos(buttonVal);
-        changeSearchState(4);
+        changeSearchState(GENFIVERANDOSTATE);
     }
 
     //add single pokemon
@@ -242,7 +246,7 @@ const PokemonApp = () => {
         if (isInTable === false){
             addToState(thePkmn);
             setCannotAddPkmnName('');
-            changeSearchState(0);   //main difference between addpkmn and addgenpkmn
+            changeSearchState(MENUSTATE);   //main difference between addpkmn and addgenpkmn
         } else{
             setCannotAddPkmnName(pkmnName);
         }
@@ -264,9 +268,13 @@ const PokemonApp = () => {
 
     // helper to check if pokemon already exists in adopted table view
     const checkTable = (pkmnName) => {
-        return tableContent.some(function(pkmn){
-            return pkmn.name === pkmnName;
-        })
+        if(tableContent.length > 0) {
+            return tableContent.some(function(pkmn){
+                return pkmn.name === pkmnName;
+            })
+        } else {
+            return false;
+        }
     };
 
     // adds pokemon to table state and table content
@@ -518,19 +526,19 @@ const PokemonApp = () => {
         <div>
             <NewPokemonHeader hideShowForm={hideShowForm} pokeballImg={pokeballImg} imgAltText={imgAltText} className='pbImg'></NewPokemonHeader>
             <FormSection>
-                {(hideForm && searchState === 0) && <h2>Search Pokemon by:</h2>}
-                {(hideForm && searchState !== 4) && <RenderForm changeSearchState={changeSearchState} searchState={searchState} newSearch={newSearch} setNewSearch={setNewSearch} changePok={changePok} 
+                {(hideForm && searchState === MENUSTATE) && <h2>Search Pokemon by:</h2>}
+                {(hideForm && searchState !== GENFIVERANDOSTATE) && <RenderForm changeSearchState={changeSearchState} searchState={searchState} newSearch={newSearch} setNewSearch={setNewSearch} changePok={changePok} 
                 searchPok={searchPok} userPokemon={userPokemon} changeGenPok={changeGenPok} addPkmn={addPkmn} isDisabled={isDisabled}></RenderForm>}
                 {/* mostly for when searching 5 randos -- add table */}
-                {(hideForm && searchState === 4) && <TableSection className='search_five_randos'>
+                {(hideForm && searchState === GENFIVERANDOSTATE) && <TableSection className='search_five_randos'>
                     <tr><th>Add</th><th>Name</th><th>Image</th><th>Type</th><th>Ability</th></tr>
                     <RenderForm changeSearchState={changeSearchState} searchState={searchState} fiveRandos={fiveRandos} addGenPkmn={addGenPkmn}></RenderForm></TableSection>}
             </FormSection>
             {/* notify user if pokemon was not found */}
             {(!isFound && searchPok) && <p color='red'>Unable to find {searchPok}!</p>}
             {/* notify user if pokemon already exists in adopted table */}
-            {(alreadyExists && cannotAddPkmnName && (searchState === 4 || searchState === 3)) && <p color='red'>{cannotAddPkmnName} is already adopted!</p>}
-            {(hideForm && searchState === 4) && <Button key={nanoid()} children='Back' onClick={() => changeSearchState(2)}></Button>}
+            {(alreadyExists && cannotAddPkmnName && (searchState === GENFIVERANDOSTATE || searchState === ADDPKMNDATASTATE)) && <p color='red'>{cannotAddPkmnName} is already adopted!</p>}
+            {(hideForm && searchState === GENFIVERANDOSTATE) && <Button key={nanoid()} children='Back' onClick={() => changeSearchState(GENBUTTONSTATE)}></Button>}
         </div>
         {/* filter section */}
         <SearchField curFilter={curFilter} handleFilter={handleFilter}></SearchField>
