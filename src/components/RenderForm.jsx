@@ -6,15 +6,16 @@ import TableSection from './TableSection';
 import DataCell from './DataCell';
 import DataCellImage from './DataCellImage';
 
-const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, addPkmn, addMultiplePkmn, isDisabled}) => {
+const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSearchState, userPokemon, changeGenPok, fiveRandos, addPkmn, addGenPkmn, isDisabled}) => {
 
     const formElmts = [];
 
     switch(searchState){
         case 1:
             // searchform -- name searchform -- gen
-            formElmts.push( 
-                <form onSubmit={changePok}>
+            formElmts.push(
+                // nanoid backfired and caused warnings, used generic key for fix
+                <form onSubmit={changePok} key='1_form'>    
                     <label htmlFor='find_pkmn'>
                         <input
                             type='text'
@@ -29,14 +30,13 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
             formElmts.push(
                 <Button 
                 className='backBu'
-                key={nanoid()}
+                key='2_form'
                 children='Back'
                 onClick={() => changeSearchState(0)}        
             />)
             break;
         case 2:
-            //searchform -- region 
-            //kanto, johto, hoenn, sinnoh, unova, kalos, alola, galar
+            //searchform -- generation/region 
             formElmts.push(
                 <Button 
                     key={nanoid()}
@@ -88,8 +88,8 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
         case 3:
             //data part
             formElmts.push(
-                <TableSection className='search_pkmn'>
-                    <tr key={nanoid()}>
+                <TableSection className='search_pkmn' key='0_table'>
+                    <tr>
                         <DataCell>
                             {userPokemon.name}
                         </DataCell>
@@ -110,13 +110,13 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                     </tr>
                 </TableSection>,
                 <Button 
-                    key={nanoid()}
+                    key='2_table'
                     children='Add'
-                    onClick={() => addPkmn()}        
+                    onClick={() => addPkmn(userPokemon.name)}        
                 />,
                 <Button 
                     className='backBu'
-                    key={nanoid()}
+                    key='3_table'
                     children='Reset'
                     onClick={() => changeSearchState(1)}        
                 />);
@@ -130,7 +130,7 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                                 <Button 
                                     key={nanoid()}
                                     children='Add'
-                                    onClick={() => addMultiplePkmn(nameText)}        
+                                    onClick={() => addGenPkmn(nameText)}        
                                 />
                             </DataCell>
                             <DataCell>
@@ -150,7 +150,6 @@ const RenderForm = ({searchState, changePok, newSearch, setNewSearch, changeSear
                                     {abilities[0] && <li>{abilities[0].ability.name}</li>} {abilities[1] && <li>{abilities[1].ability.name}</li>} {abilities[2] && <li>{abilities[2].ability.name}</li>}
                                 </ul>
                             </DataCell>
-                            {/* add datacfell for region */}
                         </tr>
                 )
             };

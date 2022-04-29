@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import {nanoid} from 'nanoid';
+import { useLocalStorage } from '../useLocalStorage';
 import FormSection from './FormSection';
 import NewPokemonHeader from './NewPokemonHeader';
 import SearchField from './SearchField';
@@ -8,7 +10,6 @@ import RenderTableRow from './RenderTableRow';
 import Button from './Button'
 import emptyPbImg from "../img/empty_pokeball.svg";
 import colorPbImg from "../img/color_pokeball.svg";
-import {nanoid} from 'nanoid';
 import '../scss/index.scss';
 
 const GENONEURL = 'generation/1/';
@@ -19,12 +20,16 @@ const GENFIVEURL = 'generation/5/';
 const GENSIXURL = 'generation/6/';
 const GENSEVENURL = 'generation/7/';
 const GENEIGHTURL = 'generation/8/';
+const MENUSTATE = 0;
+const GENBUTTONSTATE = 2;
+const ADDPKMNDATASTATE = 3;
+const GENFIVERANDOSTATE = 4;
 const BASEURL = 'https://pokeapi.co/api/v2/';
 //list of pokemon 404'ing in api
 const excludeList = ['deoxys', 'wormadam', 'giratina', 'shaymin', 'wormadam', 'giratina', 'shaymin', 
 'basculin', 'darmanitan', 'thundurus', 'tornadus', 'keldeo', 'landorus', 'meloetta', 'aegislash', 
 'meowstic', 'pumpkaboo', 'zygarde', 'gourgeist', 'morpeko', 'indeedee', 'eiscue', 'toxtricity', 'urshifu',
-'oricorio', 'wishiwashi', 'lycanroc', 'minior', 'mimikyu', 'oricorio']
+'oricorio', 'wishiwashi', 'lycanroc', 'minior', 'mimikyu', 'oricorio'];
 
 const PokemonApp = () => {
     const [count, setCount] = useState(0);                  //counter for search
@@ -34,16 +39,18 @@ const PokemonApp = () => {
     const [sortCount3, setSortCount3] = useState(0);
     const [isDisabled, setIsDisabled] = useState(true);
     const [hideForm, setHideForm] = useState(false);
-    const [pokeballImg, setPokeballImg] = useState(emptyPbImg);
+    const [pokeballImg, setPokeballImg] = useState(emptyPbImg); //hide/show toggle img button
     const [imgAltText, setImgAltText] = useState('show form');
-    const [searchState, setSearchState] = useState(0);
+    const [searchState, setSearchState] = useState(MENUSTATE);
     const [newSearch, setNewSearch] = useState('');
     const [searchPok, setSearchPok] = useState('');
     const [userPokemon, setUserPokemon] = useState({});
     const [fiveRandos, setFiveRandos] = useState([]);
     const [curFilter, setCurFilter] = useState('');
-    const [tableContent, setTableContent] = useState([]);   //table the user views
-    const [tableState, setTableState] = useState([]);       //holds table state for filtering
+    const [alreadyExists, setAlreadyExists] = useState(false);
+    const [tableContent, setTableContent] = useLocalStorage('pkmns', '');   //table the user views
+    const [tableState, setTableState] = useState(tableContent);             //holds table state for filtering
+    const [cannotAddPkmnName, setCannotAddPkmnName] = useState('');
     const [firstGenContent, setFirstGenContent] = useState([]);
     const [genTwoContent, setGenTwoContent] = useState([]);
     const [genThreeContent, setGenThreeContent] = useState([]);
@@ -73,14 +80,15 @@ const PokemonApp = () => {
     //if user pokemon found, change search state to the data view
     useEffect(() => {
         if(isFound === true){
-            changeSearchState(3);
+            changeSearchState(ADDPKMNDATASTATE);
         }
     }, [isFound])
 
     //reset searchPok when changing views from adding pokemon (mostly for warning message if pokemon not found)
     useEffect(() => {
-        if (searchState !== 2){
+        if (searchState !== GENBUTTONSTATE){
             setSearchPok('');
+            setCannotAddPkmnName('');
         }
     }, [searchState])
 
@@ -110,10 +118,8 @@ const PokemonApp = () => {
                     )).then(thePokemon => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);
                         setFirstGenContent(successfulPromises); //set all content of first 151 pokemon
-                        setTableContent(successfulPromises.slice(0, 19)); //set first twenty pokemon content
-                        setTableState(successfulPromises.slice(0, 19));
                     }).catch(function(err){
-                        console.log(err.message)
+                        console.log(err.message);
                     })
                     break;
                 case 2: //johto
@@ -123,7 +129,7 @@ const PokemonApp = () => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);
                         setGenTwoContent(successfulPromises); //set content fetched pokemon
                     }).catch(function(err){
-                        console.log(err.message)
+                        console.log(err.message);
                     })
                     break;
                 case 3: //hoenn
@@ -133,7 +139,7 @@ const PokemonApp = () => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);    //once we filter, we map for the thing we're looking for to avoid for eachs or any other repetitive iteration
                         setGenThreeContent(successfulPromises); //set content fetched pokemon
                     }).catch(function(err){
-                        console.log(err.message)
+                        console.log(err.message);
                     })
                     break;
                 case 4: //sinnoh
@@ -143,7 +149,7 @@ const PokemonApp = () => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);
                         setGenFourContent(successfulPromises); //set content fetched pokemon
                     }).catch(function(err){
-                        console.log(err.message)
+                        console.log(err.message);
                     })
                     break;
                 case 5: //unova
@@ -153,7 +159,7 @@ const PokemonApp = () => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);
                         setGenFiveContent(successfulPromises); //set content fetched pokemon
                     }).catch(function(err){
-                        console.log(err.message)
+                        console.log(err.message);
                     })
                     break;
                 case 6: //kallos
@@ -163,7 +169,7 @@ const PokemonApp = () => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);
                         setGenSixContent(successfulPromises); //set content fetched pokemon
                     }).catch(function(err){
-                        console.log(err.message)
+                        console.log(err.message);
                     })
                     break;
                 case 7: //alola
@@ -173,7 +179,7 @@ const PokemonApp = () => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);
                         setGenSevenContent(successfulPromises); //set content fetched pokemon
                     }).catch(function(err){
-                        console.log(err.message)
+                        console.log(err.message);
                     })
                     break;
                 default: //galar
@@ -183,7 +189,7 @@ const PokemonApp = () => {
                         const successfulPromises = thePokemon.filter(p => p.status === 'fulfilled').map(result => result.value);
                         setGenEightContent(successfulPromises); //set content fetched pokemon
                     }).catch(function(err){
-                        console.log(err.message)
+                        console.log(err.message);
                     })
             }
         }
@@ -199,10 +205,12 @@ const PokemonApp = () => {
 
     // change views for adding pokemon section
     const changeSearchState = (buttonVal) => {
+        const nameButton = 1;
+        const generationButton = 2;
         setSearchState(buttonVal);
-        if(buttonVal === 1){
+        if(buttonVal === nameButton){
             setNewSearch('');
-        } else if(buttonVal === 2){
+        } else if(buttonVal === generationButton){
             setFiveRandos([]);
         }
     }
@@ -210,7 +218,10 @@ const PokemonApp = () => {
     //event handler for filter pokemon field
     const handleFilter = (filter) => {
         setCurFilter(filter);
-        const filtered = [...tableState].filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+        //filter by name, first type, or first ability
+        const filtered = [...tableState].filter(p => p.name.toLowerCase().includes(filter.toLowerCase()) 
+        || p.types[0].type.name.toLowerCase().includes(filter.toLowerCase())
+        || p.abilities[0].ability.name.toLowerCase().includes(filter.toLowerCase()));
         setTableContent(filtered);
     }
 
@@ -224,42 +235,63 @@ const PokemonApp = () => {
     //call function to populate state w/ five random pokemon from user chosen generation
     const changeGenPok = (buttonVal) => {
         populateFiveRandos(buttonVal);
-        changeSearchState(4);
+        changeSearchState(GENFIVERANDOSTATE);
     }
 
     //add single pokemon
-    const addPkmn = () => {
-        const thePkmn = userPokemon;
-        //add to table state
-        setTableState(tableState => ([
-            ...tableState,
-            thePkmn
-        ]));
-        //add to table view
-        setTableContent(TableContent => ([
-            ...TableContent,
-            thePkmn
-        ]));
-        //reset
-        changeSearchState(0)
+    const addPkmn = (pkmnName) => {
+        const thePkmn = filterAll(pkmnName);
+        const isInTable = checkTable(thePkmn.name);
+        setAlreadyExists(isInTable);
+        if (isInTable === false){
+            addToState(thePkmn);
+            setCannotAddPkmnName('');
+            changeSearchState(MENUSTATE);   //main difference between addpkmn and addgenpkmn
+        } else{
+            setCannotAddPkmnName(pkmnName);
+        }
     }
 
     //same above but for generation
-    const addMultiplePkmn = (pkmnName) => {
+    const addGenPkmn = (pkmnName) => {
         const thePkmn = filterAll(pkmnName);
+        const isInTable = checkTable(thePkmn.name);
+        setIsFound(false);  //mostly for gen search reasons
+        setAlreadyExists(isInTable);
+        if (isInTable === false){
+            addToState(thePkmn);
+            setCannotAddPkmnName('');
+        } else{
+            setCannotAddPkmnName(pkmnName);
+        }
+    }
+
+    // helper to check if pokemon already exists in adopted table view
+    const checkTable = (pkmnName) => {
+        if(tableContent.length > 0) {
+            return tableContent.some(function(pkmn){
+                return pkmn.name === pkmnName;
+            })
+        } else {
+            return false;
+        }
+    };
+
+    // adds pokemon to table state and table content
+    const addToState = (pkmnData) => {
         setTableState(tableState => ([
             ...tableState,
-            thePkmn
+            pkmnData
         ]));
-        setTableContent(TableContent => ([
-            ...TableContent,
-            thePkmn
+        setTableContent(tableContent => ([
+            ...tableContent,
+            pkmnData
         ]));
     }
 
     //remove pokemon from table
     const removePkmn = (pkmnName) => {
-        const filtered = [...tableState].filter(p => p.name.toLowerCase() !== pkmnName.toLowerCase());
+        const filtered = [...tableState].filter(p => (p.name.toLowerCase() !== pkmnName.toLowerCase()));
         setTableState(filtered);
         setTableContent(filtered);
     }
@@ -278,7 +310,7 @@ const PokemonApp = () => {
                         ...fiveRandos,
                         randomPkmn
                     ]));
-                }
+                };
                 break;
             case 2:
                 genMax = genTwoContent.length-1
@@ -289,7 +321,7 @@ const PokemonApp = () => {
                         ...fiveRandos,
                         randomPkmn
                     ]));
-                }
+                };
                 break;
             case 3:
                 genMax = genThreeContent.length-1
@@ -300,7 +332,7 @@ const PokemonApp = () => {
                         ...fiveRandos,
                         randomPkmn
                     ]));
-                }
+                };
                 break;
             case 4:
                 genMax = genFourContent.length-1
@@ -311,7 +343,7 @@ const PokemonApp = () => {
                         ...fiveRandos,
                         randomPkmn
                     ]));
-                }
+                };
                 break;
             case 5:
                 genMax = genFiveContent.length-1
@@ -322,7 +354,7 @@ const PokemonApp = () => {
                         ...fiveRandos,
                         randomPkmn
                     ]));
-                }
+                };
                 break;
             case 6:
                 genMax = genSixContent.length-1
@@ -333,7 +365,7 @@ const PokemonApp = () => {
                         ...fiveRandos,
                         randomPkmn
                     ]));
-                }
+                };
                 break;
             case 7:
                 genMax = genSevenContent.length-1
@@ -344,9 +376,9 @@ const PokemonApp = () => {
                         ...fiveRandos,
                         randomPkmn
                     ]));
-                }
+                };
                 break;
-            case 8:
+            default:    //gen 8 by default
                 genMax = genEightContent.length-1
                 for(let i = 0; i < 5; i ++){
                     let randoPkmnVal = Math.floor(Math.random() * genMax);
@@ -355,12 +387,9 @@ const PokemonApp = () => {
                         ...fiveRandos,
                         randomPkmn
                     ]));
-                }
-                break;
-            default:
-                //shouldn't happen
-        }
-    }
+                };
+        };
+    };
     
     // find user selected pokemon
     const findPokemon = (curPokemon) => {
@@ -368,10 +397,10 @@ const PokemonApp = () => {
         let didFind = false;
         if (typeof foundPokemon === 'object'){
             didFind = true;
-            setUserPokemon(foundPokemon)
-        }
+            setUserPokemon(foundPokemon);
+        };
         setIsFound(didFind);
-    }
+    };
 
     //helper to find pokemon regardless of generation
     const filterAll = (curPokemon) => {
@@ -379,7 +408,7 @@ const PokemonApp = () => {
             ...genSixContent, ...genSevenContent, ...genEightContent].find(({name}) => name === curPokemon);
 
         return pokeData;
-    }
+    };
 
     //helper to sort pokemon by name
     const handleSortName = () => {
@@ -387,10 +416,10 @@ const PokemonApp = () => {
         if (sortCount % 3 === 2){
             setTableContent(tableState);
         } else if (sortCount % 3 === 1){
-            sortDesc(initPok, 0)
+            sortDesc(initPok, 0);
         } else {
-            sortAsc(initPok, 0)
-        }
+            sortAsc(initPok, 0);
+        };
 
         setSortCount(prevCount => prevCount+1);
         setSortCount2(0);
@@ -403,9 +432,9 @@ const PokemonApp = () => {
         if (sortCount2 % 3 === 2){
             setTableContent(tableState);
         } else if (sortCount2 % 3 === 1){
-            sortDesc(initPok, 1)
+            sortDesc(initPok, 1);
         } else {
-            sortAsc(initPok, 1)
+            sortAsc(initPok, 1);
         }
         setSortCount(0);
         setSortCount2(prevCount => prevCount+1);
@@ -418,9 +447,9 @@ const PokemonApp = () => {
         if (sortCount3 % 3 === 2){
             setTableContent(tableState);
         } else if (sortCount3 % 3 === 1){
-            sortDesc(initPok, 2)
+            sortDesc(initPok, 2);
         } else {
-            sortAsc(initPok, 2)
+            sortAsc(initPok, 2);
         }
         setSortCount(0);
         setSortCount2(0);
@@ -456,7 +485,7 @@ const PokemonApp = () => {
             return 0;
         });   
         setTableContent(sortedPok);
-    }
+    };
 
     //helper to sort descending
     const sortDesc = (sortPok, sortNum) => {
@@ -487,7 +516,7 @@ const PokemonApp = () => {
             return 0;
         });   
         setTableContent(sortedPok);
-    } 
+    }; 
 
     return (
     <>
@@ -497,23 +526,25 @@ const PokemonApp = () => {
         <div>
             <NewPokemonHeader hideShowForm={hideShowForm} pokeballImg={pokeballImg} imgAltText={imgAltText} className='pbImg'></NewPokemonHeader>
             <FormSection>
-                {(hideForm && searchState === 0) && <h2>Search Pokemon by</h2>}
-                {(hideForm && searchState !== 4) && <RenderForm changeSearchState={changeSearchState} searchState={searchState} newSearch={newSearch} setNewSearch={setNewSearch} changePok={changePok} 
+                {(hideForm && searchState === MENUSTATE) && <h2>Search Pokemon by</h2>}
+                {(hideForm && searchState !== GENFIVERANDOSTATE) && <RenderForm changeSearchState={changeSearchState} searchState={searchState} newSearch={newSearch} setNewSearch={setNewSearch} changePok={changePok} 
                 searchPok={searchPok} userPokemon={userPokemon} changeGenPok={changeGenPok} addPkmn={addPkmn} isDisabled={isDisabled}></RenderForm>}
                 {/* mostly for when searching 5 randos -- add table */}
-                {(hideForm && searchState === 4) && <TableSection className='search_five_randos'>
+                {(hideForm && searchState === GENFIVERANDOSTATE) && <TableSection className='search_five_randos'>
                     <tr><th>Add</th><th>Name</th><th>Image</th><th>Type</th><th>Ability</th></tr>
-                    <RenderForm changeSearchState={changeSearchState} searchState={searchState} fiveRandos={fiveRandos} addMultiplePkmn={addMultiplePkmn}></RenderForm></TableSection>}
+                    <RenderForm changeSearchState={changeSearchState} searchState={searchState} fiveRandos={fiveRandos} addGenPkmn={addGenPkmn}></RenderForm></TableSection>}
             </FormSection>
-            {(hideForm && searchState === 4) && <Button key={nanoid()} children='Back' className='randoBut' onClick={() => changeSearchState(2)}></Button>}
-            {/* let user know if pokemon was not found */}
-            {(!isFound && searchPok) && <p color='red'>Unable to find {searchPok}</p>}
+            {/* notify user if pokemon was not found */}
+            {(!isFound && searchPok) && <p color='red'>Unable to find {searchPok}!</p>}
+            {/* notify user if pokemon already exists in adopted table */}
+            {(alreadyExists && cannotAddPkmnName && (searchState === GENFIVERANDOSTATE || searchState === ADDPKMNDATASTATE)) && <p color='red'>{cannotAddPkmnName} is already adopted!</p>}
+            {(hideForm && searchState === GENFIVERANDOSTATE) && <Button key={nanoid()} className='randoBut' children='Back' onClick={() => changeSearchState(GENBUTTONSTATE)}></Button>}
         </div>
         {/* filter section */}
         <SearchField curFilter={curFilter} handleFilter={handleFilter}></SearchField>
         {/* table section */}
         <TableSection className='adopted_pkmn'>
-            {tableContent && <tr ><th id="text" onClick={handleSortName}>Name</th><th >Image</th><th id="text" onClick={handleSortType}>Type</th><th id='text' onClick={handleSortAb}>Ability</th><th>Remove</th></tr>}
+            {tableContent && <tr><th id="text" onClick={handleSortName}>Name</th><th >Image</th><th id="text" onClick={handleSortType}>Type</th><th id='text' onClick={handleSortAb}>Ability</th><th>Remove</th></tr>}
             {tableContent && <RenderTableRow tableContent={tableContent} removePkmn={removePkmn}></RenderTableRow>}
         </TableSection>
     </> 

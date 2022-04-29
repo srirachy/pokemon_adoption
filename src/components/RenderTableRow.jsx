@@ -4,7 +4,6 @@ import DataCellImage from './DataCellImage';
 import Button from './Button'
 import {nanoid} from 'nanoid';
 
-
 const RenderImages = ({tableContent, removePkmn}) => {
     const imgElmts = [];
 
